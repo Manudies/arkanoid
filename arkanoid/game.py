@@ -17,7 +17,9 @@ class Arkanoid:
     def jugar(self):
         """Bucle principal"""
         for escena in self.escenas:
-            escena.bucle_principal()
+            pulso_X = escena.bucle_principal()
+            if pulso_X == True:
+                break
         pg.quit()
 
 
