@@ -71,6 +71,7 @@ class Partida(Escena):
                 if evento.type == pg.QUIT or (evento.type == pg.KEYUP and evento.key == pg.K_ESCAPE):
                     return True
             self.pintar_fondo()
+            self.jugador.update()
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
             pg.display.flip()
 
