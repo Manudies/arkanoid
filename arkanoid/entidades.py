@@ -2,10 +2,12 @@ import os
 
 import pygame as pg
 
-from . import ANCHO, ALTO, MARGEN
+from . import ANCHO, ALTO
 
 
 class Raqueta(pg.sprite.Sprite):
+    margen = 25
+    velocidad = 20
 
     def __init__(self):
         super().__init__()
@@ -15,8 +17,8 @@ class Raqueta(pg.sprite.Sprite):
             self.imagenes.append(pg.image.load(ruta_img))
         self.contador = 0
         self.image = self.imagenes[self.contador]
-
-        self.rect = self.image.get_rect(midbottom=(ANCHO/2, ALTO-MARGEN))
+        self.rect = self.image.get_rect(
+            midbottom=(ANCHO/2, ALTO - self.margen))
 
     def update(self):
         self.contador += 1
@@ -24,7 +26,20 @@ class Raqueta(pg.sprite.Sprite):
             self.contador = 0
         self.image = self.imagenes[self.contador]
 
+        teclas = pg.key.get_pressed()
+        if teclas[pg.K_RIGHT]:
+            if self.rect.x >= ANCHO-self.rect.width:
+                self.rect.right = ANCHO
+            else:
+                self.rect.x += self.velocidad
+        if teclas[pg.K_LEFT]:
+            if self.rect.x <= 0:
+                self.rect.x = 0
+            else:
+                self.rect.x -= self.velocidad
+
     def mover(self):
+
         pass
 
     def pintar(self):
