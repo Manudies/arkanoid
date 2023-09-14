@@ -4,7 +4,7 @@ import os
 import pygame as pg
 # Tus dependencias
 from . import ANCHO, ALTO, COLOR_FONDO_PARTIDA, COLOR_FONDO_MEJORES_JUGADORES, COLOR_FONDO_PORTADA, FPS
-from .entidades import Raqueta
+from .entidades import Ladrillo, Pelota, Raqueta
 
 
 class Escena:
@@ -61,9 +61,12 @@ class Partida(Escena):
         ruta = os.path.join("resources", "images", "background.jpg")
         self.fondo = pg.image.load(ruta)
         self.jugador = Raqueta()
+        self.pelota = Pelota()
+        self.muro = []
 
     def bucle_principal(self):
         super().bucle_principal()
+        self.crear_muro()
         salir = False
         while not salir:
             self.reloj.tick(FPS)
@@ -72,7 +75,9 @@ class Partida(Escena):
                     return True
             self.pintar_fondo()
             self.jugador.update()
+            self.pelota.update()
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
+            self.pantalla.blit(self.pelota.image, self.pelota.rect)
             pg.display.flip()
 
     def pintar_fondo(self):
@@ -83,6 +88,15 @@ class Partida(Escena):
         self.pantalla.blit(self.fondo, (0, 800))
         self.pantalla.blit(self.fondo, (600, 800))
         self.pantalla.blit(self.fondo, (1200, 0))
+
+    def crear_muro(self):
+        filas = 4
+        columnas = 6
+        for fila in range(filas):  # 0-3
+            for col in range(columnas):
+                ladrillo = Ladrillo()
+                self.muro.append(ladrillo)
+        print(f"Tengo {len(ladrillos)} ladrillos")
 
 
 class MejoresJugadores (Escena):
