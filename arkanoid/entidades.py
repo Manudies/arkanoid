@@ -48,11 +48,11 @@ class Raqueta(pg.sprite.Sprite):
 
 
 class Pelota(pg.sprite.Sprite):
-    velocidad = 15
-    margen = 25+30
+    velocidad_x = -15
+    velocidad_y = -15
     control_animacion = 1
 
-    def __init__(self):
+    def __init__(self, raqueta):
         super().__init__()
         self.imagenes = []
         for i in range(5):
@@ -60,20 +60,31 @@ class Pelota(pg.sprite.Sprite):
             self.imagenes.append(pg.image.load(ruta_img))
         self.contador = 0
         self.image = self.imagenes[self.contador]
-        self.rect = self.image.get_rect(
-            midbottom=(ANCHO/2, ALTO - self.margen))
+        self.raqueta = raqueta
+        self.rect = self.image.get_rect(midbottom=self.raqueta.rect.midtop)
 
-    def update(self):
+    def update(self, partida_empezada):
         # Animación de la pelota
-        # self.contador += self.control_animacion
-        # if self.contador in (0, 4):
-        #    self.control_animacion = -self.control_animacion
-        # self.image = self.imagenes[self.contador]
+
         # Mover pelota
-        for evento in pg.event.get():
-            if evento.type == pg.KEYDOWN and evento.key == pg.K_SPACE:
-                self.rect.x -= self.velocidad
-                self.rect.y -= self.velocidad
+        if partida_empezada:
+            self.rect.x += self.velocidad_x
+            if self.rect.left <= 0 or self.rect.right > ANCHO:
+                # self.rebote()
+                self.velocidad_x = -self.velocidad_x
+
+            self.rect.y += self.velocidad_y
+            if self.rect.top <= 0:
+                # self.rebote()
+                self.velocidad_y = -self.velocidad_y
+        else:
+            self.rect = self.image.get_rect(midbottom=self.raqueta.rect.midtop)
+
+    def rebote(self):
+        self.contador += self.control_animacion
+        if self.contador in (0, 4):
+            self.control_animacion = -self.control_animacion
+        self.image = self.imagenes[self.contador]
 
 
 class Ladrillo(pg.sprite.Sprite):

@@ -61,22 +61,28 @@ class Partida(Escena):
         ruta = os.path.join("resources", "images", "background.jpg")
         self.fondo = pg.image.load(ruta)
         self.jugador = Raqueta()
-        self.pelota = Pelota()
-        self.muro = []
+        self.pelota = Pelota(self.jugador)
+        self.muro = pg.sprite.Group()
 
     def bucle_principal(self):
         super().bucle_principal()
+        print("Tengo", len(self.muro), "ladrillos")
         self.crear_muro()
+        print("Tengo", len(self.muro), "ladrillos")
         salir = False
+        juego_iniciado = False
         while not salir:
             self.reloj.tick(FPS)
             for evento in pg.event.get():
                 if evento.type == pg.QUIT or (evento.type == pg.KEYUP and evento.key == pg.K_ESCAPE):
                     return True
+                if evento.type == pg.KEYDOWN and evento.key == pg.K_SPACE:
+                    juego_iniciado = True
             self.pintar_fondo()
             self.jugador.update()
-            self.pelota.update()
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
+            self.muro.draw(self.pantalla)
+            self.pelota.update(juego_iniciado)
             self.pantalla.blit(self.pelota.image, self.pelota.rect)
             pg.display.flip()
 
@@ -92,11 +98,15 @@ class Partida(Escena):
     def crear_muro(self):
         filas = 4
         columnas = 6
-        for fila in range(filas):  # 0-3
+        margen_superior = 25
+        ladrillo_med = Ladrillo()
+        margen_izquierdo = ((ANCHO - ladrillo_med.rect.width*columnas)/2)
+        for fil in range(filas):  # 0-3
             for col in range(columnas):
                 ladrillo = Ladrillo()
-                self.muro.append(ladrillo)
-        print(f"Tengo {len(ladrillos)} ladrillos")
+                self.muro.add(ladrillo)
+                ladrillo.rect.x = ladrillo.rect.width * col + margen_izquierdo
+                ladrillo.rect.y = ladrillo.rect.height * fil + margen_superior
 
 
 class MejoresJugadores (Escena):
