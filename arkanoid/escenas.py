@@ -61,8 +61,8 @@ class Partida(Escena):
         ruta = os.path.join("resources", "images", "background.jpg")
         self.fondo = pg.image.load(ruta)
         self.jugador = Raqueta()
-        self.pelota = Pelota(self.jugador)
         self.muro = pg.sprite.Group()
+        self.pelota = Pelota(self.jugador)
 
     def bucle_principal(self):
         super().bucle_principal()
