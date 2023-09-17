@@ -44,6 +44,8 @@ class Raqueta(pg.sprite.Sprite):
 class Pelota(pg.sprite.Sprite):
     velocidad_x = -15
     velocidad_y = -15
+    velocidad_max = 20
+    velocidad_min = 10
 
     def __init__(self, raqueta):
         super().__init__()
@@ -71,12 +73,16 @@ class Pelota(pg.sprite.Sprite):
 
         else:
             self.rect = self.image.get_rect(midbottom=self.raqueta.rect.midtop)
+
         # Rebote Pala
         if self.rect.colliderect(self.raqueta):
-            # rebota a 90º
-            self.velocidad_y = -self.velocidad_y
-            # Funciona con CHOICE rebota aleatoriamente a derechas o izquierdas
-            self.velocidad_x = choice([self.velocidad_x, -self.velocidad_x])
+            # rebota a 90º aleatoriamente a derechas o izquierdas (Posible modo FACIL)
+            # self.velocidad_y = -self.velocidad_y
+            # self.velocidad_x = choice([self.velocidad_x, -self.velocidad_x])
+            # rebota aleatoriamente
+            self.velocidad_y = randint(-self.velocidad_max, -
+                                       self.velocidad_min)
+            self.velocidad_x = randint(-self.velocidad_max, self.velocidad_max)
 
     def rebote(self):
         self.contador += self.control_animacion
