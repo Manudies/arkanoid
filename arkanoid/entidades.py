@@ -58,6 +58,7 @@ class Pelota(pg.sprite.Sprite):
         self.image = self.imagenes[self.contador]
         self.raqueta = raqueta
         self.rect = self.image.get_rect(midbottom=self.raqueta.rect.midtop)
+        # self.muro = muro
 
     def update(self, partida_empezada):
         # Mover pelota
@@ -79,10 +80,15 @@ class Pelota(pg.sprite.Sprite):
             # rebota a 90º aleatoriamente a derechas o izquierdas (Posible modo FACIL)
             # self.velocidad_y = -self.velocidad_y
             # self.velocidad_x = choice([self.velocidad_x, -self.velocidad_x])
-            # rebota aleatoriamente
+            # rebota aleatoriamente con un velocidad MIN en Y
             self.velocidad_y = randint(-self.velocidad_max, -
                                        self.velocidad_min)
             self.velocidad_x = randint(-self.velocidad_max, self.velocidad_max)
+
+        # Rebote MURO
+        # if pg.sprite.spritecollide(self.pelota, self.muro, True):
+        #    self.velocidad_x = -self.velocidad_x
+        #    self.velocidad_y = -self.velocidad_y
 
     def rebote(self):
         self.contador += self.control_animacion
@@ -100,5 +106,5 @@ class Ladrillo(pg.sprite.Sprite):
         self.image = pg.image.load(ruta_verde)
         self.rect = self.image.get_rect()
 
-    def update():
+    def update(self):
         pass

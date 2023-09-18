@@ -1,9 +1,10 @@
 # Librerias estandar
 import os
+from random import choice
 # Librerias de terceros
 import pygame as pg
 # Tus dependencias
-from . import ANCHO, ALTO, COLOR_FONDO_PARTIDA, COLOR_FONDO_MEJORES_JUGADORES, COLOR_FONDO_PORTADA, FPS
+from . import ANCHO, ALTO, COLOR_FONDO_MEJORES_JUGADORES, COLOR_FONDO_PARTIDA, COLOR_FONDO_PORTADA, FPS
 from .entidades import Ladrillo, Pelota, Raqueta
 
 
@@ -84,6 +85,7 @@ class Partida(Escena):
             self.muro.draw(self.pantalla)
             self.pelota.update(juego_iniciado)
             self.pantalla.blit(self.pelota.image, self.pelota.rect)
+            self.rebotar_muro()
             pg.display.flip()
 
     def pintar_fondo(self):
@@ -107,6 +109,13 @@ class Partida(Escena):
                 self.muro.add(ladrillo)
                 ladrillo.rect.x = ladrillo.rect.width * col + margen_izquierdo
                 ladrillo.rect.y = ladrillo.rect.height * fil + margen_superior
+
+    def rebotar_muro(self):
+        if pg.sprite.spritecollide(self.pelota, self.muro, True):
+            # Rebote sencillo
+            self.pelota.velocidad_x = choice(
+                [self.pelota.velocidad_x, -self.pelota.velocidad_x])
+            self.pelota.velocidad_y = -self.pelota.velocidad_y
 
 
 class MejoresJugadores (Escena):
