@@ -9,6 +9,7 @@ class Records:
     # __file__ hace referencia al archivo actual (records.py)
     filename = 'records.csv'
     file_dir = os.path.dirname(os.path.realpath(__file__))
+    path = os.path.join(file_dir, "data", filename)
 
     def __init__(self):
         self.game_records = []
