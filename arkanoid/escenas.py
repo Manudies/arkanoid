@@ -4,8 +4,8 @@ from random import choice
 # Librerias de terceros
 import pygame as pg
 # Tus dependencias
-from . import ANCHO, ALTO, COLOR_FONDO_MEJORES_JUGADORES, COLOR_FONDO_PARTIDA, COLOR_FONDO_PORTADA, FPS
-from .entidades import Ladrillo, Pelota, Raqueta
+from . import ANCHO, ALTO, COLOR_FONDO_MEJORES_JUGADORES, COLOR_FONDO_PARTIDA, COLOR_FONDO_PORTADA, FPS, VIDAS
+from .entidades import Ladrillo, Pelota, Raqueta, ContadorVidas, Marcador
 
 
 class Escena:
@@ -59,63 +59,87 @@ class Portada(Escena):
 class Partida(Escena):
     def __init__(self, pantalla):
         super().__init__(pantalla)
-        ruta = os.path.join("resources", "images", "background.jpg")
-        self.fondo = pg.image.load(ruta)
+        ruta_fondo = os.path.join('resources', 'images', 'background.jpg')
+        self.fondo = pg.image.load(ruta_fondo)
         self.jugador = Raqueta()
         self.muro = pg.sprite.Group()
         self.pelota = Pelota(self.jugador)
+        self.contador_vidas = ContadorVidas(VIDAS)
+        self.marcador = Marcador()
 
     def bucle_principal(self):
         super().bucle_principal()
-        print("Tengo", len(self.muro), "ladrillos")
+        print('Estamos en el bucle principal de PARTIDA')
         self.crear_muro()
-        print("Tengo", len(self.muro), "ladrillos")
         salir = False
         juego_iniciado = False
         while not salir:
             self.reloj.tick(FPS)
             for evento in pg.event.get():
-                if evento.type == pg.QUIT or (evento.type == pg.KEYUP and evento.key == pg.K_ESCAPE):
+                if evento.type == pg.QUIT or evento.type == pg.KEYDOWN and evento.key == pg.K_ESCAPE:
                     return True
                 if evento.type == pg.KEYDOWN and evento.key == pg.K_SPACE:
                     juego_iniciado = True
+
             self.pintar_fondo()
+
             self.jugador.update()
             self.pantalla.blit(self.jugador.image, self.jugador.rect)
+
             self.muro.draw(self.pantalla)
+
             self.pelota.update(juego_iniciado)
             self.pantalla.blit(self.pelota.image, self.pelota.rect)
-            self.rebotar_muro()
+
+            golpeados = pg.sprite.spritecollide(self.pelota, self.muro, False)
+            if len(golpeados) > 0:
+                for ladrillo in golpeados:
+                    # eliminado = ladrillo.update(muro)
+                    # if eliminado:
+                    if ladrillo.update(self.muro):
+                        self.marcador.aumentar(ladrillo.puntos)
+                self.pelota.vel_y = -self.pelota.vel_y
+
+            self.marcador.pintar(self.pantalla)
+
             pg.display.flip()
 
+            if self.pelota.he_perdido:
+                # acciones cada vez que pierdo una vida
+                salir = self.contador_vidas.perder_vida()
+                self.pelota.he_perdido = False
+                juego_iniciado = False
+
     def pintar_fondo(self):
-        self.pantalla.fill(COLOR_FONDO_PARTIDA)
-        # Mejorar este sistema de pintado
+        self.pantalla.fill((0, 0, 99))
+        # TODO: mejorar la lógica para "rellenar" el fondo
         self.pantalla.blit(self.fondo, (0, 0))
         self.pantalla.blit(self.fondo, (600, 0))
         self.pantalla.blit(self.fondo, (0, 800))
         self.pantalla.blit(self.fondo, (600, 800))
-        self.pantalla.blit(self.fondo, (1200, 0))
 
     def crear_muro(self):
-        filas = 4
-        columnas = 6
-        margen_superior = 25
-        ladrillo_med = Ladrillo()
-        margen_izquierdo = ((ANCHO - ladrillo_med.rect.width*columnas)/2)
-        for fil in range(filas):  # 0-3
-            for col in range(columnas):
-                ladrillo = Ladrillo()
-                self.muro.add(ladrillo)
-                ladrillo.rect.x = ladrillo.rect.width * col + margen_izquierdo
-                ladrillo.rect.y = ladrillo.rect.height * fil + margen_superior
+        filas = 6
+        columnas = 9
+        margen_superior = 60
+        tipo = None
 
-    def rebotar_muro(self):
-        if pg.sprite.spritecollide(self.pelota, self.muro, True):
-            # Rebote sencillo
-            self.pelota.velocidad_x = choice(
-                [self.pelota.velocidad_x, -self.pelota.velocidad_x])
-            self.pelota.velocidad_y = -self.pelota.velocidad_y
+        for fila in range(filas):   # 0-3
+            for col in range(columnas):
+                # por aquí voy a pasar filas*columnas = 24 veces
+                if tipo == Ladrillo.ROJO:
+                    tipo = Ladrillo.VERDE
+                else:
+                    tipo = Ladrillo.ROJO
+                puntos = (tipo+1)*(20-fila*2)
+                ladrillo = Ladrillo(puntos, tipo)
+                margen_izquierdo = (ANCHO - columnas * ladrillo.rect.width) / 2
+                # x = ancho_lad * col
+                # y = alto_lad * fila
+                ladrillo.rect.x = ladrillo.rect.width * col + margen_izquierdo
+                ladrillo.rect.y = ladrillo.rect.height * fila + margen_superior
+                self.muro.add(ladrillo)
+                print(tipo, fila, col, puntos)
 
 
 class MejoresJugadores (Escena):
