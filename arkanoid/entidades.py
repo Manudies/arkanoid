@@ -66,6 +66,7 @@ class Pelota(pg.sprite.Sprite):
         # Mover pelota
         if se_mueve_la_pelota == False:
             self.rect = self.image.get_rect(midbottom=self.raqueta.rect.midtop)
+            return False, False
         else:
             self.rect.x += self.vel_x
             if self.rect.left <= 0 or self.rect.right >= ANCHO:
@@ -150,9 +151,10 @@ class ContadorVidas:
 class Marcador:
     def __init__(self):
         self.valor = 0
+        self.puntos = "Puntos:"
         fuente = 'LibreFranklin-VariableFont_wght.ttf'
         ruta = os.path.join('resources', 'fonts', fuente)
-        self.tipo_letra = pg.font.Font(ruta, 35)
+        self.tipo_letra = pg.font.Font(ruta, 30)
 
     def aumentar(self, incremento):
         self.valor += incremento
@@ -161,7 +163,10 @@ class Marcador:
         r = pg.rect.Rect(0, 0, ANCHO, ALTO_MARCADOR)
         pg.draw.rect(pantalla, (0, 0, 0), r)
         cadena = str(self.valor)
+        fijo = str(self.puntos)
         texto = self.tipo_letra.render(cadena, True, (230, 189, 55))
+        texto_fijo = self.tipo_letra.render(fijo, True, (230, 189, 55))
         pos_x = 20
-        pos_y = 10
-        pantalla.blit(texto, (pos_x, pos_y))
+        pos_y = (ALTO_MARCADOR-30)/2
+        pantalla.blit(texto_fijo, (pos_x, pos_y))
+        pantalla.blit(texto, (pos_x + 110, pos_y))
