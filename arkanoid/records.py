@@ -46,13 +46,13 @@ class Records:
     def guardar(self):
         # lector = open(self.file_path, mode='w')
         # lector.close()
-        with open(self.file_path, mode='w') as records_file:
+        with open(self.file_path, mode='w', newline="\n") as records_file:
             writer = csv.writer(records_file)
             writer.writerow(('Nombre', 'Puntos'))
             writer.writerows(self.game_records)
 
     def cargar(self):
-        with open(self.file_path, mode='r') as records_file:
+        with open(self.file_path, mode='r', newline="\n") as records_file:
             reader = csv.reader(records_file)
             contador = 0
             self.game_records = []
